@@ -4,21 +4,22 @@
   <meta charset="UTF-8" />
   <title>Analizador de Pólizas con IA</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #050816;
-      --card-bg: rgba(8, 11, 20, 0.98);
-      --accent: #f5b754;
-      --accent-soft: rgba(245, 183, 84, 0.14);
-      --border-subtle: rgba(148, 163, 253, 0.16);
-      --text-main: #e5e7eb;
-      --text-soft: #9ca3af;
-      --radius-xl: 22px;
-      --radius-md: 14px;
-      --shadow-soft: 0 22px 80px rgba(0,0,0,0.65);
-      --transition-fast: 0.22s ease-out;
-      --transition-med: 0.32s ease-out;
+      --bg: #f5f5f7;
+      --surface: #ffffff;
+      --border-subtle: #e5e5e7;
+      --border-strong: #d4d4d8;
+      --text-main: #111827;
+      --text-soft: #6b7280;
+      --accent: #111827;
+      --accent-soft: #f3f4f6;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --transition: 0.22s ease-out;
+      --shadow-soft: 0 14px 40px rgba(15,23,42,0.06);
+      --font: "Inter", system-ui, -apple-system, -sans-serif;
     }
 
     * {
@@ -29,156 +30,138 @@
 
     body {
       min-height: 100vh;
-      font-family: "Manrope", system-ui, -apple-system, sans-serif;
-      background:
-        radial-gradient(900px 900px at 0% 0%, rgba(245,183,84,0.06), transparent),
-        radial-gradient(900px 900px at 100% 0%, rgba(56,189,248,0.05), transparent),
-        radial-gradient(1100px 1100px at 0% 100%, rgba(129,140,248,0.06), transparent),
-        var(--bg);
+      font-family: var(--font);
+      background: var(--bg);
       color: var(--text-main);
       display: flex;
       justify-content: center;
-      padding: 40px 16px;
+      padding: 32px 16px;
     }
 
     .shell {
       width: 100%;
-      max-width: 1220px;
+      max-width: 1120px;
       display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(0, 2fr);
-      gap: 26px;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.8fr);
+      gap: 24px;
       align-items: stretch;
     }
 
-    /* Lateral izquierdo: marca y propuesta de valor */
+    /* Lateral: marca y propuesta */
     .side {
-      padding: 22px 22px 20px;
-      border-radius: var(--radius-xl);
+      padding: 20px 20px 18px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
       border: 1px solid var(--border-subtle);
-      background: radial-gradient(circle at top, rgba(245,183,84,0.06), transparent) var(--card-bg);
-      backdrop-filter: blur(18px);
       box-shadow: var(--shadow-soft);
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
     }
 
-    .brand-pill {
+    .pill {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 5px 11px;
+      gap: 6px;
+      padding: 4px 10px;
       border-radius: 999px;
-      background-color: rgba(15,23,42,0.98);
-      border: 1px solid rgba(148,163,253,0.18);
+      background: #f9fafb;
+      border: 1px solid var(--border-subtle);
       font-size: 10px;
       color: var(--text-soft);
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
     }
 
-    .brand-dot {
-      width: 7px;
-      height: 7px;
+    .pill-dot {
+      width: 6px;
+      height: 6px;
       border-radius: 999px;
       background: var(--accent);
-      box-shadow: 0 0 10px rgba(245,183,84,0.9);
     }
 
     .title {
-      font-size: 26px;
-      line-height: 1.22;
+      font-size: 24px;
+      line-height: 1.3;
       font-weight: 600;
-      letter-spacing: 0.01em;
-      color: #f9fafb;
+      color: var(--text-main);
     }
 
     .title span {
-      color: var(--accent);
-      font-weight: 600;
+      font-weight: 400;
+      color: var(--text-soft);
     }
 
     .subtitle {
       font-size: 12px;
       color: var(--text-soft);
+      line-height: 1.7;
       max-width: 320px;
-      line-height: 1.6;
     }
 
-    .bullets {
+    .list {
       margin-top: 4px;
       display: grid;
-      gap: 6px;
+      gap: 4px;
       font-size: 11px;
       color: var(--text-soft);
     }
 
-    .bullet {
+    .list-item {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
     }
 
-    .bullet span.icon {
-      width: 14px;
-      height: 14px;
-      border-radius: 6px;
-      background: var(--accent-soft);
-      border: 1px solid rgba(245,183,84,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      color: var(--accent);
+    .list-bullet {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      background: var(--accent);
     }
 
-    .metric-card {
+    .note-box {
       margin-top: 8px;
-      padding: 10px 11px;
+      padding: 10px 10px;
       border-radius: var(--radius-md);
-      border: 1px solid rgba(249,250,251,0.04);
-      background: radial-gradient(circle at top right, rgba(245,183,84,0.08), transparent),
-                  rgba(9,9,15,0.98);
+      border: 1px solid var(--border-subtle);
+      background: #f9fafb;
       display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
+      flex-direction: column;
+      gap: 4px;
     }
 
-    .metric-label {
-      font-size: 9px;
+    .note-label {
+      font-size: 10px;
+      color: var(--text-soft);
       text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .note-main {
+      font-size: 12px;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .note-sub {
+      font-size: 10px;
       color: var(--text-soft);
-      letter-spacing: 0.16em;
     }
 
-    .metric-value {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--accent);
-    }
-
-    .metric-note {
-      font-size: 9px;
-      color: var(--text-soft);
-      max-width: 150px;
-      line-height: 1.5;
-    }
-
-    .hint {
+    .footnote {
       margin-top: auto;
       font-size: 9px;
-      color: #6b7280;
+      color: var(--text-soft);
     }
 
-    /* Panel derecho: uploader + chat */
+    /* Panel derecho: funcional */
     .panel {
-      padding: 20px 18px 16px;
-      border-radius: var(--radius-xl);
-      border: 1px solid rgba(148,163,253,0.16);
-      background: radial-gradient(circle at top, rgba(15,23,42,0.9), rgba(6,8,16,0.98));
+      padding: 18px 16px 14px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
       box-shadow: var(--shadow-soft);
-      backdrop-filter: blur(22px);
       display: flex;
       flex-direction: column;
       gap: 14px;
@@ -188,15 +171,21 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+    }
+
+    .panel-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
     .panel-title {
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--accent);
+      letter-spacing: 0.12em;
+      color: var(--text-main);
     }
 
     .panel-subtitle {
@@ -204,46 +193,38 @@
       color: var(--text-soft);
     }
 
-    .badge-live {
+    .badge {
       padding: 4px 9px;
       border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      font-size: 9px;
+      color: var(--text-soft);
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-size: 9px;
-      color: var(--accent);
-      background: rgba(12,16,30,1);
-      border: 1px solid rgba(245,183,84,0.36);
+      gap: 5px;
     }
 
-    .badge-live span.dot {
+    .badge-dot {
       width: 6px;
       height: 6px;
       border-radius: 999px;
       background: var(--accent);
-      box-shadow: 0 0 8px rgba(245,183,84,0.9);
     }
 
     .uploader {
-      padding: 11px 11px 9px;
+      padding: 10px 10px 8px;
       border-radius: var(--radius-md);
-      border: 1px solid rgba(75,85,99,0.9);
-      background: linear-gradient(
-        135deg,
-        rgba(15,23,42,0.98),
-        rgba(9,9,15,0.98)
-      );
-      display: grid;
-      grid-template-columns: minmax(0, 1.9fr) auto;
-      gap: 10px;
-      align-items: center;
+      border: 1px solid var(--border-strong);
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
     .uploader-label {
-      font-size: 10px;
-      color: var(--text-main);
-      margin-bottom: 3px;
+      font-size: 11px;
       font-weight: 500;
+      color: var(--text-main);
     }
 
     .uploader-text {
@@ -251,44 +232,43 @@
       color: var(--text-soft);
     }
 
-    .file-input-wrap {
+    .uploader-row {
       display: flex;
-      gap: 6px;
-      align-items: center;
-      margin-top: 5px;
       flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 3px;
     }
 
     input[type="file"] {
       font-size: 9px;
       color: var(--text-soft);
-      max-width: 190px;
+      max-width: 210px;
     }
 
     .btn {
-      padding: 7px 14px;
+      padding: 6px 14px;
       border-radius: 999px;
-      border: none;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #ffffff;
       font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.09em;
+      font-weight: 500;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
-      background: var(--accent);
-      color: #050816;
-      box-shadow: 0 10px 26px rgba(245,183,84,0.35);
-      transition: all var(--transition-fast);
-      white-space: nowrap;
+      transition: all var(--transition);
     }
 
     .btn:hover {
+      background: #000000;
+      border-color: #000000;
+      box-shadow: 0 10px 26px rgba(15,23,42,0.14);
       transform: translateY(-1px);
-      box-shadow: 0 18px 38px rgba(0,0,0,0.7);
-      background: #fbd38d;
     }
 
     .btn:disabled {
-      opacity: 0.45;
+      opacity: 0.5;
       cursor: not-allowed;
       box-shadow: none;
       transform: none;
@@ -296,84 +276,75 @@
 
     #uploadStatus {
       font-size: 9px;
-      color: #22c55e;
-      margin-top: 2px;
+      color: #16a34a;
     }
 
     #uploadError {
       font-size: 9px;
-      color: #f97316;
-      margin-top: 2px;
+      color: #b91c1c;
     }
 
     .chat-label {
+      margin-top: 2px;
       font-size: 9px;
       color: var(--text-soft);
       display: flex;
       justify-content: space-between;
-      gap: 6px;
+      gap: 8px;
       align-items: center;
     }
 
     .chat-label strong {
+      font-size: 10px;
       color: var(--text-main);
-      font-weight: 500;
-      font-size: 9px;
-    }
-
-    #chat {
-      margin-top: 4px;
-      padding: 8px 8px;
-      border-radius: 16px;
-      border: 1px solid rgba(55,65,81,0.9);
-      background:
-        radial-gradient(circle at top left, rgba(148,163,253,0.06), transparent),
-        rgba(3,7,18,0.98);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      max-height: 280px;
-      overflow-y: auto;
-      scroll-behavior: smooth;
-    }
-
-    .msg {
-      padding: 7px 9px;
-      border-radius: 9px;
-      font-size: 9.5px;
-      line-height: 1.55;
-      max-width: 82%;
-      border: 1px solid transparent;
-    }
-
-    .msg.user {
-      margin-left: auto;
-      background: radial-gradient(circle at top right, rgba(245,183,84,0.08), transparent),
-                  rgba(9,9,15,1);
-      border-color: rgba(245,183,84,0.16);
-    }
-
-    .msg.bot {
-      margin-right: auto;
-      background: rgba(9,9,15,0.98);
-      border-color: rgba(75,85,99,0.9);
-      color: var(--text-soft);
-    }
-
-    .msg.bot strong {
-      color: var(--accent);
       font-weight: 500;
     }
 
     #noPolicy {
       display: none;
       font-size: 9px;
-      color: #f97316;
+      color: #b45309;
       margin-top: 4px;
     }
 
+    #chat {
+      margin-top: 6px;
+      padding: 8px;
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      background: #fdfdfd;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .msg {
+      padding: 7px 9px;
+      border-radius: 10px;
+      font-size: 9.5px;
+      line-height: 1.5;
+      max-width: 80%;
+      border: 1px solid transparent;
+      white-space: pre-line;
+    }
+
+    .msg.bot {
+      background: #ffffff;
+      border-color: var(--border-subtle);
+      color: var(--text-soft);
+    }
+
+    .msg.user {
+      margin-left: auto;
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
     .composer {
-      margin-top: 7px;
+      margin-top: 6px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 8px;
@@ -384,24 +355,23 @@
       width: 100%;
       resize: none;
       padding: 7px 9px;
-      border-radius: 12px;
-      border: 1px solid rgba(75,85,99,0.95);
-      background: rgba(3,7,18,0.98);
-      color: var(--text-main);
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: #ffffff;
       font-size: 9.5px;
-      line-height: 1.5;
+      color: var(--text-main);
       outline: none;
-      transition: all var(--transition-fast);
-      box-shadow: 0 10px 26px rgba(0,0,0,0.45);
+      transition: all var(--transition);
+      box-shadow: 0 8px 22px rgba(15,23,42,0.04);
     }
 
     textarea::placeholder {
-      color: #6b7280;
+      color: #9ca3af;
     }
 
     textarea:focus {
       border-color: var(--accent);
-      box-shadow: 0 18px 40px rgba(0,0,0,0.7);
+      box-shadow: 0 12px 30px rgba(15,23,42,0.08);
       transform: translateY(-1px);
     }
 
@@ -409,130 +379,122 @@
       display: none;
       margin-top: 2px;
       font-size: 8px;
-      color: #6b7280;
+      color: var(--text-soft);
     }
 
     .typing span {
       display: inline-block;
-      width: 4px;
-      height: 4px;
+      width: 3px;
+      height: 3px;
       margin-right: 2px;
       border-radius: 999px;
-      background: #6b7280;
+      background: #9ca3af;
       animation: pulse 0.9s infinite alternate;
     }
 
-    .typing span:nth-child(2) { animation-delay: 0.15s; }
-    .typing span:nth-child(3) { animation-delay: 0.3s; }
+    .typing span:nth-child(2) { animation-delay: 0.16s; }
+    .typing span:nth-child(3) { animation-delay: 0.32s; }
 
     @keyframes pulse {
-      from { opacity: 0.35; transform: translateY(0); }
-      to { opacity: 1; transform: translateY(-1px); }
+      from { opacity: 0.4; transform: translateY(0); }
+      to   { opacity: 1;   transform: translateY(-1px); }
     }
 
     @media (max-width: 880px) {
-      body { padding: 22px 10px; }
+      body { padding: 20px 10px; }
       .shell {
         grid-template-columns: 1fr;
-      }
-      .side {
-        order: 1;
-      }
-      .panel {
-        order: 2;
+        gap: 16px;
       }
     }
   </style>
 </head>
 <body>
   <div class="shell">
-    <!-- Lateral marca / confianza -->
+    <!-- Columna izquierda -->
     <aside class="side">
-      <div class="brand-pill">
-        <div class="brand-dot"></div>
-        POLICY INTELLIGENCE SUITE
+      <div class="pill">
+        <div class="pill-dot"></div>
+        Policy Intelligence · Demo
       </div>
       <h1 class="title">
-        Asistente de pólizas con precisión <span>de estudio.</span>
+        Analizador de pólizas con IA
+        <span>orientado a práctica profesional.</span>
       </h1>
       <p class="subtitle">
-        Interfaz diseñada para despachos, brokers y aseguradoras que exigen lectura fina,
-        respuestas claras y experiencia de primer nivel.
+        Interfaz discreta y neutra para integrar lectura de pólizas y consultas inteligentes
+        en un flujo que podés escalar a clientes, despachos o brokers.
       </p>
-      <div class="bullets">
-        <div class="bullet">
-          <span class="icon">✓</span>
-          <div>Subí la póliza y obtené respuestas contextuales en segundos.</div>
+      <div class="list">
+        <div class="list-item">
+          <div class="list-bullet"></div>
+          <div>Upload de póliza y sesión de chat en una sola vista.</div>
         </div>
-        <div class="bullet">
-          <span class="icon">✓</span>
-          <div>Enfoque en coberturas, exclusiones, límites y condiciones especiales.</div>
+        <div class="list-item">
+          <div class="list-bullet"></div>
+          <div>Listo para conectar a tu backend seguro con file search.</div>
         </div>
-        <div class="bullet">
-          <span class="icon">✓</span>
-          <div>Base lista para integrar planes de suscripción por usuario o por póliza.</div>
-        </div>
-      </div>
-      <div class="metric-card">
-        <div>
-          <div class="metric-label">Pensado para operación real</div>
-          <div class="metric-value">24/7</div>
-        </div>
-        <div class="metric-note">
-          Una sola infraestructura centralizada para múltiples clientes, controlando consumo y margen.
+        <div class="list-item">
+          <div class="list-bullet"></div>
+          <div>Estructura pensada para modelo de suscripción multiusuario.</div>
         </div>
       </div>
-      <div class="hint">
-        Esta demo trabaja en el navegador. La lógica real (segura y rentable) se conecta a tu backend privado.
+      <div class="note-box">
+        <div class="note-label">Base operativa</div>
+        <div class="note-main">Un solo punto de acceso para tus clientes.</div>
+        <div class="note-sub">
+          El frontal se mantiene estático y liviano; la lógica crítica vive en tu infraestructura.
+        </div>
+      </div>
+      <div class="footnote">
+        Esta demo no expone llaves ni lógica sensible. Lo siguiente es conectar tu API privada.
       </div>
     </aside>
 
-    <!-- Panel funcional -->
+    <!-- Columna derecha -->
     <section class="panel">
       <div class="panel-header">
-        <div>
-          <div class="panel-title">Póliza + Chat Inteligente</div>
-          <div class="panel-subtitle">
-            Flujo pensado para onboarding inmediato de usuarios finales.
-          </div>
+        <div class="panel-title-wrap">
+          <div class="panel-title">Póliza + Chat</div>
+          <div class="panel-subtitle">Flujo simple: subir documento, consultar, responder.</div>
         </div>
-        <div class="badge-live">
-          <span class="dot"></span>
-          Demo interactiva
+        <div class="badge">
+          <div class="badge-dot"></div>
+          Interfaz activa
         </div>
       </div>
 
+      <!-- Uploader -->
       <div class="uploader">
-        <div>
-          <div class="uploader-label">1. Subí la póliza del cliente</div>
-          <div class="uploader-text">
-            Formatos sugeridos: PDF, DOCX o imagen clara. Cada archivo se asocia a una sesión.
-          </div>
-          <div class="file-input-wrap">
-            <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
-            <button class="btn" id="uploadBtn">Cargar póliza</button>
-          </div>
-          <div id="uploadStatus"></div>
-          <div id="uploadError"></div>
+        <div class="uploader-label">1. Subí la póliza del cliente</div>
+        <div class="uploader-text">
+          PDF, DOCX o imagen legible. En producción se asocia a un ID de sesión o usuario.
         </div>
+        <div class="uploader-row">
+          <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+          <button class="btn" id="uploadBtn">Subir póliza</button>
+        </div>
+        <div id="uploadStatus"></div>
+        <div id="uploadError"></div>
       </div>
 
+      <!-- Chat -->
       <div class="chat-label">
         <div>
-          <strong>2. Consultá sobre la póliza</strong><br>
-          Podés preguntar por deducibles, exclusiones, vigencias, cláusulas especiales, etc.
+          <strong>2. Consultas sobre la póliza</strong><br>
+          Preguntas sobre coberturas, exclusiones, límites, deducibles, condiciones particulares, etc.
         </div>
-        <div style="font-size:8px; color:#6b7280; text-align:right;">
-          Demo local. En producción, conectado a tu motor IA seguro.
+        <div style="font-size:8px; text-align:right;">
+          Demo local. El análisis real se ejecuta en tu backend IA.
         </div>
       </div>
 
-      <div id="noPolicy">Primero cargá una póliza para activar el análisis contextual.</div>
+      <div id="noPolicy">Subí una póliza para responder en contexto.</div>
 
       <div id="chat">
         <div class="msg bot">
           Cargá una póliza y luego preguntá, por ejemplo:
-          <strong>“¿Qué exclusiones aplican al robo de mercancía en tránsito?”</strong>
+          “¿Qué exclusiones aplican al robo de mercancía en esta póliza?”
         </div>
       </div>
 
@@ -540,14 +502,14 @@
         <textarea
           id="input"
           rows="2"
-          placeholder="Escribí tu consulta aquí. Ejemplo: ¿Cuál es el deducible por daños por agua según esta póliza?"
+          placeholder="Ejemplo: ¿Cuál es el deducible por daños por agua según esta póliza?"
         ></textarea>
-        <button class="btn" id="send">Enviar consulta</button>
+        <button class="btn" id="send">Enviar</button>
       </div>
 
       <div class="typing" id="typing">
         <span></span><span></span><span></span>
-        Analizando póliza…
+        Analizando documento…
       </div>
     </section>
   </div>
@@ -586,26 +548,28 @@
 
       uploadBtn.disabled = true;
 
-      // Demo: simulamos éxito de carga (en producción: llamar a tu backend).
+      // Demo: simulación de carga correcta.
       setTimeout(() => {
         policyLoaded = true;
-        uploadStatus.textContent = `Póliza "${file.name}" registrada para esta sesión.`;
+        uploadStatus.textContent = `Póliza "${file.name}" registrada para esta sesión (demo).`;
         uploadBtn.disabled = false;
-        addMessage('La póliza fue cargada correctamente. Ahora podés consultar cláusulas, límites y exclusiones específicas.', 'bot');
-      }, 600);
+        addMessage(
+          'La póliza fue cargada en esta sesión (modo demo). En producción se almacenaría en tu backend para análisis seguro.',
+          'bot'
+        );
+      }, 500);
     });
 
-    function simulateAiAnswer(question) {
-      // Respuesta demo con enfoque técnico-seguro para pólizas
-      return [
-        'Esta es una respuesta simulada basada en la póliza cargada.',
-        'En una versión productiva, el motor IA leería el documento y devolvería:',
-        '- Referencia a la sección o cláusula relevante.',
-        '- Explicación breve en lenguaje claro.',
-        '- Aclaraciones sobre exclusiones, límites o deducibles aplicables.',
-        '',
-        'La arquitectura real se conecta a tu backend, donde se controla seguridad, costos y reglas del negocio.'
-      ].join('\n');
+    function buildDemoAnswer(question) {
+      return (
+        'Respuesta simulada basada en la póliza cargada.\n' +
+        'En la versión real, el sistema:\n' +
+        '- Extrae el texto de la póliza.\n' +
+        '- Localiza las cláusulas relevantes.\n' +
+        '- Devuelve una explicación clara, con referencias a secciones específicas.\n' +
+        '\n' +
+        'Todo gestionado desde tu backend, donde controlás seguridad, costos y reglas de negocio.'
+      );
     }
 
     async function handleSend() {
@@ -623,11 +587,11 @@
       typing.style.display = 'inline-flex';
 
       setTimeout(() => {
-        const answer = simulateAiAnswer(text);
+        const answer = buildDemoAnswer(text);
         addMessage(answer, 'bot');
         sendBtn.disabled = false;
         typing.style.display = 'none';
-      }, 700);
+      }, 600);
     }
 
     sendBtn.addEventListener('click', handleSend);
