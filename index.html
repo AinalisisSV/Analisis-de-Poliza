@@ -4,129 +4,640 @@
   <meta charset="UTF-8" />
   <title>Analizador de Pólizas con IA</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; margin: 0; background: #f4f4f6; }
-    header { padding: 16px 24px; background: #111827; color: #f9fafb; font-size: 18px; font-weight: 600; }
-    .container { max-width: 900px; margin: 24px auto; padding: 16px; background: #ffffff; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); }
-    .section-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #111827; }
-    .subtitle { color: #6b7280; font-size: 12px; margin-bottom: 12px; }
-    #uploader { margin-bottom: 16px; padding: 12px; border-radius: 12px; background: #f9fafb; border: 1px solid #e5e7eb; }
-    input[type="file"] { font-size: 12px; margin-bottom: 6px; }
-    button { padding: 6px 14px; border-radius: 8px; border: none; cursor: pointer; font-size: 12px; font-weight: 500; background: #111827; color: #f9fafb; }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    #uploadStatus { margin-top: 4px; font-size: 11px; color: #059669; }
-    #uploadError { margin-top: 4px; font-size: 11px; color: #b91c1c; }
-    #chatWrapper { margin-top: 12px; }
-    #chat { max-height: 320px; overflow-y: auto; padding: 8px 0; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px; }
-    .msg { padding: 6px 8px; border-radius: 8px; font-size: 12px; line-height: 1.5; max-width: 90%; }
-    .user { background: #dbeafe; align-self: flex-end; }
-    .bot { background: #f3f4f6; align-self: flex-start; }
-    .row { display: flex; gap: 6px; }
-    textarea { flex: 1; resize: none; padding: 6px 8px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 12px; }
-    #noPolicy { font-size: 11px; color: #b91c1c; margin-bottom: 4px; display: none; }
+    :root {
+      --bg: #050816;
+      --card-bg: rgba(8, 11, 20, 0.98);
+      --accent: #f5b754;
+      --accent-soft: rgba(245, 183, 84, 0.14);
+      --border-subtle: rgba(148, 163, 253, 0.16);
+      --text-main: #e5e7eb;
+      --text-soft: #9ca3af;
+      --radius-xl: 22px;
+      --radius-md: 14px;
+      --shadow-soft: 0 22px 80px rgba(0,0,0,0.65);
+      --transition-fast: 0.22s ease-out;
+      --transition-med: 0.32s ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Manrope", system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(900px 900px at 0% 0%, rgba(245,183,84,0.06), transparent),
+        radial-gradient(900px 900px at 100% 0%, rgba(56,189,248,0.05), transparent),
+        radial-gradient(1100px 1100px at 0% 100%, rgba(129,140,248,0.06), transparent),
+        var(--bg);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1220px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 2fr);
+      gap: 26px;
+      align-items: stretch;
+    }
+
+    /* Lateral izquierdo: marca y propuesta de valor */
+    .side {
+      padding: 22px 22px 20px;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top, rgba(245,183,84,0.06), transparent) var(--card-bg);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background-color: rgba(15,23,42,0.98);
+      border: 1px solid rgba(148,163,253,0.18);
+      font-size: 10px;
+      color: var(--text-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .brand-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(245,183,84,0.9);
+    }
+
+    .title {
+      font-size: 26px;
+      line-height: 1.22;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: #f9fafb;
+    }
+
+    .title span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--text-soft);
+      max-width: 320px;
+      line-height: 1.6;
+    }
+
+    .bullets {
+      margin-top: 4px;
+      display: grid;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .bullet {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .bullet span.icon {
+      width: 14px;
+      height: 14px;
+      border-radius: 6px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(245,183,84,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: var(--accent);
+    }
+
+    .metric-card {
+      margin-top: 8px;
+      padding: 10px 11px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(249,250,251,0.04);
+      background: radial-gradient(circle at top right, rgba(245,183,84,0.08), transparent),
+                  rgba(9,9,15,0.98);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .metric-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      letter-spacing: 0.16em;
+    }
+
+    .metric-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .metric-note {
+      font-size: 9px;
+      color: var(--text-soft);
+      max-width: 150px;
+      line-height: 1.5;
+    }
+
+    .hint {
+      margin-top: auto;
+      font-size: 9px;
+      color: #6b7280;
+    }
+
+    /* Panel derecho: uploader + chat */
+    .panel {
+      padding: 20px 18px 16px;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(148,163,253,0.16);
+      background: radial-gradient(circle at top, rgba(15,23,42,0.9), rgba(6,8,16,0.98));
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(22px);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .panel-subtitle {
+      font-size: 10px;
+      color: var(--text-soft);
+    }
+
+    .badge-live {
+      padding: 4px 9px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9px;
+      color: var(--accent);
+      background: rgba(12,16,30,1);
+      border: 1px solid rgba(245,183,84,0.36);
+    }
+
+    .badge-live span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(245,183,84,0.9);
+    }
+
+    .uploader {
+      padding: 11px 11px 9px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(75,85,99,0.9);
+      background: linear-gradient(
+        135deg,
+        rgba(15,23,42,0.98),
+        rgba(9,9,15,0.98)
+      );
+      display: grid;
+      grid-template-columns: minmax(0, 1.9fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .uploader-label {
+      font-size: 10px;
+      color: var(--text-main);
+      margin-bottom: 3px;
+      font-weight: 500;
+    }
+
+    .uploader-text {
+      font-size: 9px;
+      color: var(--text-soft);
+    }
+
+    .file-input-wrap {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-top: 5px;
+      flex-wrap: wrap;
+    }
+
+    input[type="file"] {
+      font-size: 9px;
+      color: var(--text-soft);
+      max-width: 190px;
+    }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: none;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: var(--accent);
+      color: #050816;
+      box-shadow: 0 10px 26px rgba(245,183,84,0.35);
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 38px rgba(0,0,0,0.7);
+      background: #fbd38d;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    #uploadStatus {
+      font-size: 9px;
+      color: #22c55e;
+      margin-top: 2px;
+    }
+
+    #uploadError {
+      font-size: 9px;
+      color: #f97316;
+      margin-top: 2px;
+    }
+
+    .chat-label {
+      font-size: 9px;
+      color: var(--text-soft);
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .chat-label strong {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 9px;
+    }
+
+    #chat {
+      margin-top: 4px;
+      padding: 8px 8px;
+      border-radius: 16px;
+      border: 1px solid rgba(55,65,81,0.9);
+      background:
+        radial-gradient(circle at top left, rgba(148,163,253,0.06), transparent),
+        rgba(3,7,18,0.98);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 280px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+
+    .msg {
+      padding: 7px 9px;
+      border-radius: 9px;
+      font-size: 9.5px;
+      line-height: 1.55;
+      max-width: 82%;
+      border: 1px solid transparent;
+    }
+
+    .msg.user {
+      margin-left: auto;
+      background: radial-gradient(circle at top right, rgba(245,183,84,0.08), transparent),
+                  rgba(9,9,15,1);
+      border-color: rgba(245,183,84,0.16);
+    }
+
+    .msg.bot {
+      margin-right: auto;
+      background: rgba(9,9,15,0.98);
+      border-color: rgba(75,85,99,0.9);
+      color: var(--text-soft);
+    }
+
+    .msg.bot strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    #noPolicy {
+      display: none;
+      font-size: 9px;
+      color: #f97316;
+      margin-top: 4px;
+    }
+
+    .composer {
+      margin-top: 7px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    textarea {
+      width: 100%;
+      resize: none;
+      padding: 7px 9px;
+      border-radius: 12px;
+      border: 1px solid rgba(75,85,99,0.95);
+      background: rgba(3,7,18,0.98);
+      color: var(--text-main);
+      font-size: 9.5px;
+      line-height: 1.5;
+      outline: none;
+      transition: all var(--transition-fast);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.45);
+    }
+
+    textarea::placeholder {
+      color: #6b7280;
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.7);
+      transform: translateY(-1px);
+    }
+
+    .typing {
+      display: none;
+      margin-top: 2px;
+      font-size: 8px;
+      color: #6b7280;
+    }
+
+    .typing span {
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      margin-right: 2px;
+      border-radius: 999px;
+      background: #6b7280;
+      animation: pulse 0.9s infinite alternate;
+    }
+
+    .typing span:nth-child(2) { animation-delay: 0.15s; }
+    .typing span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes pulse {
+      from { opacity: 0.35; transform: translateY(0); }
+      to { opacity: 1; transform: translateY(-1px); }
+    }
+
+    @media (max-width: 880px) {
+      body { padding: 22px 10px; }
+      .shell {
+        grid-template-columns: 1fr;
+      }
+      .side {
+        order: 1;
+      }
+      .panel {
+        order: 2;
+      }
+    }
   </style>
 </head>
 <body>
-<header>Analizador de Pólizas con IA</header>
+  <div class="shell">
+    <!-- Lateral marca / confianza -->
+    <aside class="side">
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        POLICY INTELLIGENCE SUITE
+      </div>
+      <h1 class="title">
+        Asistente de pólizas con precisión <span>de estudio.</span>
+      </h1>
+      <p class="subtitle">
+        Interfaz diseñada para despachos, brokers y aseguradoras que exigen lectura fina,
+        respuestas claras y experiencia de primer nivel.
+      </p>
+      <div class="bullets">
+        <div class="bullet">
+          <span class="icon">✓</span>
+          <div>Subí la póliza y obtené respuestas contextuales en segundos.</div>
+        </div>
+        <div class="bullet">
+          <span class="icon">✓</span>
+          <div>Enfoque en coberturas, exclusiones, límites y condiciones especiales.</div>
+        </div>
+        <div class="bullet">
+          <span class="icon">✓</span>
+          <div>Base lista para integrar planes de suscripción por usuario o por póliza.</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div>
+          <div class="metric-label">Pensado para operación real</div>
+          <div class="metric-value">24/7</div>
+        </div>
+        <div class="metric-note">
+          Una sola infraestructura centralizada para múltiples clientes, controlando consumo y margen.
+        </div>
+      </div>
+      <div class="hint">
+        Esta demo trabaja en el navegador. La lógica real (segura y rentable) se conecta a tu backend privado.
+      </div>
+    </aside>
 
-<div class="container">
-  <div id="uploader">
-    <div class="section-title">1. Subí tu póliza</div>
-    <div class="subtitle">
-      Subí tu póliza para que el asistente responda solo con base en ese documento. (Demo visual)
-    </div>
-    <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
-    <button id="uploadBtn">Subir póliza</button>
-    <div id="uploadStatus"></div>
-    <div id="uploadError"></div>
+    <!-- Panel funcional -->
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Póliza + Chat Inteligente</div>
+          <div class="panel-subtitle">
+            Flujo pensado para onboarding inmediato de usuarios finales.
+          </div>
+        </div>
+        <div class="badge-live">
+          <span class="dot"></span>
+          Demo interactiva
+        </div>
+      </div>
+
+      <div class="uploader">
+        <div>
+          <div class="uploader-label">1. Subí la póliza del cliente</div>
+          <div class="uploader-text">
+            Formatos sugeridos: PDF, DOCX o imagen clara. Cada archivo se asocia a una sesión.
+          </div>
+          <div class="file-input-wrap">
+            <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+            <button class="btn" id="uploadBtn">Cargar póliza</button>
+          </div>
+          <div id="uploadStatus"></div>
+          <div id="uploadError"></div>
+        </div>
+      </div>
+
+      <div class="chat-label">
+        <div>
+          <strong>2. Consultá sobre la póliza</strong><br>
+          Podés preguntar por deducibles, exclusiones, vigencias, cláusulas especiales, etc.
+        </div>
+        <div style="font-size:8px; color:#6b7280; text-align:right;">
+          Demo local. En producción, conectado a tu motor IA seguro.
+        </div>
+      </div>
+
+      <div id="noPolicy">Primero cargá una póliza para activar el análisis contextual.</div>
+
+      <div id="chat">
+        <div class="msg bot">
+          Cargá una póliza y luego preguntá, por ejemplo:
+          <strong>“¿Qué exclusiones aplican al robo de mercancía en tránsito?”</strong>
+        </div>
+      </div>
+
+      <div class="composer">
+        <textarea
+          id="input"
+          rows="2"
+          placeholder="Escribí tu consulta aquí. Ejemplo: ¿Cuál es el deducible por daños por agua según esta póliza?"
+        ></textarea>
+        <button class="btn" id="send">Enviar consulta</button>
+      </div>
+
+      <div class="typing" id="typing">
+        <span></span><span></span><span></span>
+        Analizando póliza…
+      </div>
+    </section>
   </div>
 
-  <div id="chatWrapper">
-    <div class="section-title">2. Consultas sobre la póliza</div>
-    <div class="subtitle">
-      Escribí tus preguntas sobre coberturas, exclusiones, deducibles, etc.
-    </div>
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const uploadError = document.getElementById('uploadError');
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('input');
+    const sendBtn = document.getElementById('send');
+    const noPolicy = document.getElementById('noPolicy');
+    const typing = document.getElementById('typing');
 
-    <div id="noPolicy">Primero subí una póliza para activar el chat.</div>
+    let policyLoaded = false;
 
-    <div id="chat"></div>
-
-    <div class="row">
-      <textarea id="input" rows="2" placeholder="Ejemplo: ¿Cuál es el deducible por robo según esta póliza?"></textarea>
-      <button id="send">Enviar</button>
-    </div>
-  </div>
-</div>
-
-<script>
-  const fileInput = document.getElementById('fileInput');
-  const uploadBtn = document.getElementById('uploadBtn');
-  const uploadStatus = document.getElementById('uploadStatus');
-  const uploadError = document.getElementById('uploadError');
-  const chat = document.getElementById('chat');
-  const input = document.getElementById('input');
-  const sendBtn = document.getElementById('send');
-  const noPolicy = document.getElementById('noPolicy');
-
-  let policyId = null;
-
-  function addMessage(text, type) {
-    const div = document.createElement('div');
-    div.className = 'msg ' + type;
-    div.textContent = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-  }
-
-  async function uploadPolicy() {
-    uploadStatus.textContent = '';
-    uploadError.textContent = '';
-    noPolicy.style.display = 'none';
-
-    const file = fileInput.files[0];
-    if (!file) {
-      uploadError.textContent = 'Seleccioná un archivo antes de subir.';
-      return;
+    function addMessage(text, type) {
+      const div = document.createElement('div');
+      div.className = 'msg ' + type;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
     }
 
-    uploadBtn.disabled = true;
+    uploadBtn.addEventListener('click', () => {
+      uploadStatus.textContent = '';
+      uploadError.textContent = '';
+      noPolicy.style.display = 'none';
 
-    // DEMO: solo simula que se sube correctamente
-    setTimeout(() => {
-      policyId = 'demo-policy-id';
-      uploadStatus.textContent = 'Póliza subida correctamente. Chat activado.';
-      uploadBtn.disabled = false;
-    }, 600);
-  }
+      const file = fileInput.files[0];
+      if (!file) {
+        uploadError.textContent = 'Seleccioná un archivo para continuar.';
+        return;
+      }
 
-  async function sendMessage() {
-    if (!policyId) {
-      noPolicy.style.display = 'block';
-      return;
+      uploadBtn.disabled = true;
+
+      // Demo: simulamos éxito de carga (en producción: llamar a tu backend).
+      setTimeout(() => {
+        policyLoaded = true;
+        uploadStatus.textContent = `Póliza "${file.name}" registrada para esta sesión.`;
+        uploadBtn.disabled = false;
+        addMessage('La póliza fue cargada correctamente. Ahora podés consultar cláusulas, límites y exclusiones específicas.', 'bot');
+      }, 600);
+    });
+
+    function simulateAiAnswer(question) {
+      // Respuesta demo con enfoque técnico-seguro para pólizas
+      return [
+        'Esta es una respuesta simulada basada en la póliza cargada.',
+        'En una versión productiva, el motor IA leería el documento y devolvería:',
+        '- Referencia a la sección o cláusula relevante.',
+        '- Explicación breve en lenguaje claro.',
+        '- Aclaraciones sobre exclusiones, límites o deducibles aplicables.',
+        '',
+        'La arquitectura real se conecta a tu backend, donde se controla seguridad, costos y reglas del negocio.'
+      ].join('\n');
     }
 
-    const text = input.value.trim();
-    if (!text) return;
+    async function handleSend() {
+      if (!policyLoaded) {
+        noPolicy.style.display = 'block';
+        return;
+      }
 
-    addMessage(text, 'user');
-    input.value = '';
-    sendBtn.disabled = true;
+      const text = input.value.trim();
+      if (!text) return;
 
-    // DEMO: respuesta fija simulando IA
-    setTimeout(() => {
-      addMessage('Esta es una respuesta de ejemplo basada en tu póliza. Aquí iría la lógica real del modelo.', 'bot');
-      sendBtn.disabled = false;
-    }, 600);
-  }
+      addMessage(text, 'user');
+      input.value = '';
+      sendBtn.disabled = true;
+      typing.style.display = 'inline-flex';
 
-  uploadBtn.addEventListener('click', uploadPolicy);
-  sendBtn.addEventListener('click', sendMessage);
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
+      setTimeout(() => {
+        const answer = simulateAiAnswer(text);
+        addMessage(answer, 'bot');
+        sendBtn.disabled = false;
+        typing.style.display = 'none';
+      }, 700);
     }
-  });
-</script>
+
+    sendBtn.addEventListener('click', handleSend);
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    });
+  </script>
 </body>
 </html>
