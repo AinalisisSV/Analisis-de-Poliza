@@ -600,8 +600,36 @@
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         handleSend();
-      }
+async function handleSend() {
+  if (!policyLoaded) {
+    noPolicy.style.display = 'block';
+    return;
+  }
+
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMessage(text, 'user');
+  input.value = '';
+  sendBtn.disabled = true;
+  typing.style.display = 'inline-flex';
+
+  try {
+    const res = await fetch('https://policy-chat.TUUSUARIO.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text })
     });
-  </script>
-</body>
-</html>
+
+    if (!res.ok) throw new Error('Error en el servidor');
+
+    const data = await res.json();
+    addMessage(data.reply || 'Sin respuesta del servidor.', 'bot');
+  } catch (err) {
+    console.error(err);
+    addMessage('Error al obtener respuesta. Revisá el Worker.', 'bot');
+  } finally {
+    sendBtn.disabled = false;
+    typing.style.display = 'none';
+  }
+}
