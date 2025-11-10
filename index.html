@@ -633,3 +633,17 @@ async function handleSend() {
     typing.style.display = 'none';
   }
 }
+// Activar el botón "Enviar" y el envío con Enter
+sendBtn.addEventListener('click', handleSend);
+
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    handleSend();
+  }
+});
+
+// Cierre del bloque de script
+</script>
+</body>
+</html>
